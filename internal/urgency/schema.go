@@ -33,7 +33,10 @@ const (
 
 	// BorderlineDelta is the distance to the nearest band boundary within which
 	// a score is considered too close to call and is routed to human review.
-	BorderlineDelta = 10
+	//
+	// A wider band would drown the signal: at ±10, 63 of the 101 possible scores
+	// would be flagged, which is most of the range and therefore useless.
+	BorderlineDelta = 5
 )
 
 // UrgencyLabel is the closed set of urgency labels.
@@ -138,13 +141,23 @@ const (
 )
 
 // Weights contribute to a score. A deescalation term subtracts.
+//
+// Each weight is chosen so a single signal lands where a reader would expect
+// it: a threat alone is urgent, an incident alone is high, a deadline word
+// alone is normal, and a bare request is low.
 const (
-	WeightThreat       = 60
-	WeightIncident     = 45
-	WeightDeadline     = 30
-	WeightRequest      = 10
-	WeightDeescalation = -15
-	WeightNone         = 0
+	WeightThreat   = 85
+	WeightIncident = 60
+	WeightDeadline = 40
+	// WeightDeadlineShort applies to an explicit numeric time window of 60
+	// minutes or less. Such a window is more urgent than a bare "hoy" and it
+	// contains no dictionary word at all, so only the time-window rule can find
+	// it. It is deliberately not a TriggerKind: the span it produces is still a
+	// deadline, this is only the variant weight.
+	WeightDeadlineShort = 65
+	WeightRequest       = 5
+	WeightDeescalation  = -15
+	WeightNone          = 0
 )
 
 // Weight returns the score contribution of a trigger kind.

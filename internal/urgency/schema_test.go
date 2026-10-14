@@ -357,21 +357,29 @@ func TestLabelForScoreBoundaries(t *testing.T) {
 func TestIsBorderline(t *testing.T) {
 	t.Parallel()
 
+	// Pins both edges of every borderline band, so a change to BorderlineDelta
+	// has to be deliberate rather than incidental.
 	tests := []struct {
 		score int
 		want  bool
 	}{
-		{score: 25, want: true},
-		{score: 15, want: true},
-		{score: 14, want: false},
-		{score: 35, want: true},
-		{score: 36, want: false},
-		{score: 45, want: true},
-		{score: 65, want: true},
-		{score: 70, want: true},
-		{score: 80, want: true},
-		{score: 100, want: false},
 		{score: 0, want: false},
+		{score: 19, want: false},
+		{score: 20, want: true},
+		{score: 25, want: true},
+		{score: 30, want: true},
+		{score: 31, want: false},
+		{score: 49, want: false},
+		{score: 50, want: true},
+		{score: 55, want: true},
+		{score: 60, want: true},
+		{score: 61, want: false},
+		{score: 74, want: false},
+		{score: 75, want: true},
+		{score: 80, want: true},
+		{score: 85, want: true},
+		{score: 86, want: false},
+		{score: 100, want: false},
 	}
 
 	for _, tt := range tests {
