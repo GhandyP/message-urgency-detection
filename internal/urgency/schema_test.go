@@ -172,15 +172,22 @@ func TestValidateDecision(t *testing.T) {
 			wantErr:  "at least one trigger span is required",
 		},
 		{
-			name: "rejects a score no span contributed to",
+			name: "accepts a score a model verdict justified rather than a span",
+			// Evidence stays deterministic while a verdict is advisory, so a
+			// refined score legitimately has no lexical span behind it. The
+			// arithmetic rule is pinned on Classify instead.
 			decision: UrgencyDecision{
 				ID:           "m1",
 				Label:        LabelHigh,
 				Score:        60,
 				TriggerSpans: []TriggerSpan{{Start: 0, End: 3, Term: "sin", Kind: KindNone, Weight: WeightNone}},
-				Rationale:    "claimed score",
+				Rationale:    "deterministic pass found nothing; a model review raised this",
 			},
-			wantErr: "score 60 has no contributing trigger span",
+		},
+		{
+			name:     "rejects a label that disagrees with the score",
+			decision: withScore(withLabel(valid, LabelLow), 90),
+			wantErr:  "does not match score 90",
 		},
 		{
 			name: "rejects an unknown trigger kind",

@@ -268,9 +268,16 @@ func ValidateRequest(r UrgencyRequest) error {
 // ValidateDecision checks the output contract.
 //
 // The rule that ties evidence to a label is deliberate: a decision must carry
-// at least one span, and a non-zero score is only allowed when at least one
-// span actually contributed to it. A label can therefore never appear without
-// the evidence that produced it.
+// at least one span, so a label can never appear without the evidence it was
+// based on.
+//
+// One property is deliberately *not* checked here: that the score equals the
+// sum of the span weights. That holds for the deterministic pass, where every
+// point of score comes from a matched term, and it is pinned by
+// TestClassifyScoreIsTheClampedSumOfSpanWeights. It cannot hold for a decision
+// a model verdict has refined, because then the score comes from the verdict
+// while the spans stay lexical. Keeping the arithmetic rule local to Classify
+// is what lets evidence stay deterministic while a verdict is still advisory.
 func ValidateDecision(d UrgencyDecision) error {
 	if strings.TrimSpace(d.ID) == "" {
 		return errors.New("decision id is required")
@@ -281,23 +288,14 @@ func ValidateDecision(d UrgencyDecision) error {
 	if d.Score < MinScore || d.Score > MaxScore {
 		return fmt.Errorf("decision %s: score %d out of range [%d, %d]", d.ID, d.Score, MinScore, MaxScore)
 	}
+	if d.Label != LabelForScore(d.Score) {
+		return fmt.Errorf("decision %s: label %q does not match score %d", d.ID, d.Label, d.Score)
+	}
 	if strings.TrimSpace(d.Rationale) == "" {
 		return fmt.Errorf("decision %s: rationale is required", d.ID)
 	}
 	if len(d.TriggerSpans) == 0 {
 		return fmt.Errorf("decision %s: at least one trigger span is required", d.ID)
-	}
-	if d.Score != 0 {
-		var contributed bool
-		for _, s := range d.TriggerSpans {
-			if s.Weight != 0 {
-				contributed = true
-				break
-			}
-		}
-		if !contributed {
-			return fmt.Errorf("decision %s: score %d has no contributing trigger span", d.ID, d.Score)
-		}
 	}
 	for i, s := range d.TriggerSpans {
 		if !s.Kind.Valid() {
