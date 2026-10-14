@@ -297,6 +297,15 @@ func ClassifyBatch(r UrgencyRequest) ([]UrgencyDecision, error) {
 			// bug, not a caller error, so it must never be silently returned.
 			return nil, fmt.Errorf("classifier produced an invalid decision: %w", err)
 		}
+		// Enforce the span invariant in production, not only in tests. This is
+		// the check that turns a byte-offset regression into a loud error: a
+		// byte offset yields a span that is well formed but points at the wrong
+		// characters, which is exactly the kind of wrong answer that would
+		// otherwise look plausible. It is an internal assertion, so a caller
+		// cannot trigger it and no unit test can reach it by construction.
+		if err := VerifySpans(m.Text, d.TriggerSpans); err != nil {
+			return nil, fmt.Errorf("classifier produced spans that do not match their text: %w", err)
+		}
 		decisions = append(decisions, d)
 	}
 
