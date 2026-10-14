@@ -1,0 +1,45 @@
+{
+  "policyVersion": "1.0.0",
+  "messages": [
+    {
+      "id": "threat-es",
+      "text": "Recibí una amenaza de bomba en la oficina"
+    },
+    {
+      "id": "deadline-short",
+      "text": "El deploy tiene que estar en 20 minutos"
+    },
+    {
+      "id": "deadline-day",
+      "text": "Necesito esto para hoy"
+    },
+    {
+      "id": "routine",
+      "text": "¿Podrías revisar esto cuando puedas? Por favor"
+    },
+    {
+      "id": "negated",
+      "text": "No es urgente, tranquilo"
+    },
+    {
+      "id": "ambiguous",
+      "text": "No es urgente, pero el servidor está caído"
+    },
+    {
+      "id": "multilingual-ja",
+      "text": "緊急のメッセージです"
+    },
+    {
+      "id": "multilingual-en",
+      "text": "There is a bomb in the building"
+    },
+    {
+      "id": "incident-es",
+      "text": "El servidor está caído desde las 3"
+    },
+    {
+      "id": "boundary-guard",
+      "text": "Estoy en la playa con la familia"
+    }
+  ]
+}
