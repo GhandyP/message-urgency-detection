@@ -1,0 +1,18 @@
+# Compiled binaries
+/message-urgency-detection
+*.exe
+*.test
+*.out
+
+# Coverage profiles
+coverage.txt
+coverage.html
+
+# Local secrets: never commit a real key
+.env
+.env.local
+
+# Editor and OS noise
+.idea/
+.vscode/
+.DS_Store
